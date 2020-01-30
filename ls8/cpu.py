@@ -17,26 +17,46 @@ class CPU:
     def ram_write(self, value, address):
         self.ram[address] = value
 
-    def load(self):
+    def load(self, file):
         """Load a program into memory."""
+        try:
+            address = 0
+            with open(file) as f:
+                for line in f:
+                    #ignore comments
+                    comment_split = line.split('#')
+                    num = comment_split[0].strip()
 
-        address = 0
+                    #ignore blank lines
+                    if num == "":
+                        continue
+
+                    value = int(num, 2) # convert binary string to int using base 2
+
+                    self.ram[address] = value
+                    address += 1
+        
+        except FileNotFoundError:
+            print(f"{sys.argv[0]}: {file} not found")
+            sys.exit(2)
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+
+
 
 
     def alu(self, op, reg_a, reg_b):
