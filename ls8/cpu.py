@@ -9,7 +9,7 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.pc = 0
-        self.ram = [0] * 256
+        self.ram = [0] * 255
 
     def ram_read(self, address):
         return self.ram[address]
@@ -70,4 +70,19 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        running = True
+
+        while running:
+            ir = self.ram_read(self.pc)
+            operand_a = self.ram_read()
+            operand_b = self.ram_read()
+
+            if opcode == LDI:
+                pass
+
+            if opcode == PRN:
+                pass
+
+            if opcode == HLT:
+                pass
         pass
