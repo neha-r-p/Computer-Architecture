@@ -79,6 +79,7 @@ class CPU:
 
         while running:
             ir = self.ram_read(self.pc)
+            opcode = ir
             operand_a = self.ram_read(self.pc + 1) #if instruction needs 1 ahead
             operand_b = self.ram_read(self.pc + 2) #if instruction needs 2 ahead
 
@@ -90,7 +91,6 @@ class CPU:
                 self.reg[operand_a] = operand_b
                 self.pc += 3
 
-            if opcode == PRN:
-                pass
-
-        pass
+            if opcode == PRN: #Print numeric value stored in the given register
+                print(self.reg[operand_a])
+                self.pc +=2 
