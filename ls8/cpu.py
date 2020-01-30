@@ -9,7 +9,7 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.pc = 0
-        self.ram = [0] * 256
+        self.ram = [0] * 256 #holds values 0 to 255
 
     def ram_read(self, address):
         return self.ram[address]
@@ -72,17 +72,25 @@ class CPU:
         """Run the CPU."""
         running = True
 
+        #opcodes
+        HLT = 0b00000001
+        LDI = 0b10000010
+        PRN = 0b01000111
+
         while running:
             ir = self.ram_read(self.pc)
-            operand_a = self.ram_read()
-            operand_b = self.ram_read()
+            operand_a = self.ram_read(self.pc + 1) #if instruction needs 1 ahead
+            operand_b = self.ram_read(self.pc + 2) #if instruction needs 2 ahead
 
-            if opcode == LDI:
-                pass
+            if opcode == HLT:
+                running = False #exits the loop
+                self.pc += 1
+
+            if opcode == LDI: #sets specified reg to specified value
+                self.reg[operand_a] = operand_b
+                self.pc += 3
 
             if opcode == PRN:
                 pass
 
-            if opcode == HLT:
-                pass
         pass
