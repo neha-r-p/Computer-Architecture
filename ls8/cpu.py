@@ -9,7 +9,7 @@ class CPU:
         """Construct a new CPU."""
         self.reg = [0] * 8
         self.pc = 0
-        self.ram = [0] * 255
+        self.ram = [0] * 256
 
     def ram_read(self, address):
         return self.ram[address]
