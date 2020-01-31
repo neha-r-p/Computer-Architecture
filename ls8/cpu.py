@@ -96,6 +96,7 @@ class CPU:
         HLT = 0b00000001
         LDI = 0b10000010
         PRN = 0b01000111
+        MUL = 0b10100010
 
         while running:
             ir = self.ram_read(self.pc)
@@ -107,10 +108,14 @@ class CPU:
                 running = False #exits the loop
                 self.pc += 1
 
-            if opcode == LDI: #sets specified reg to specified value
+            elif opcode == LDI: #sets specified reg to specified value
                 self.reg[operand_a] = operand_b
                 self.pc += 3
 
-            if opcode == PRN: #Print numeric value stored in the given register
+            elif opcode == PRN: #Print numeric value stored in the given register
                 print(self.reg[operand_a])
-                self.pc +=2 
+                self.pc +=2
+
+            elif opcode == MUL: # Multiply the values in two registers together and store the result in registerA.
+                self.reg[operand_a] *= self.reg[operand_b]
+                self.pc += 3
