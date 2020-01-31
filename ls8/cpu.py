@@ -10,12 +10,25 @@ class CPU:
         self.reg = [0] * 8
         self.pc = 0
         self.ram = [0] * 256 #holds values 0 to 255
+        self.sp = 7 #number in reg reserved for sp
+        self.reg[self.sp] = 0xF4 #start of empty stack
+
 
     def ram_read(self, address):
         return self.ram[address]
 
     def ram_write(self, value, address):
         self.ram[address] = value
+
+    def push(self, register): #Push the value in the given register on the stack.
+        self.reg[self.sp] -= 1 #decrement pointer
+        ram_address = self.reg[self.sp]
+        self.ram[ram_address] = self.reg[register] #copy value of given reg into address pointed to by sp
+
+    def pop(self, register):
+        ram_address = self.reg[self.sp]
+        self.reg[register] = self.ram[ram_address] #Copy the value from the address pointed to by SP to the given register.
+        self.reg[self.sp] += 1 #Increment SP.
 
     def load(self, file):
         """Load a program into memory."""
@@ -97,6 +110,8 @@ class CPU:
         LDI = 0b10000010
         PRN = 0b01000111
         MUL = 0b10100010
+        PUSH = 0b01000101
+        POP = 0b01000110
 
         while running:
             ir = self.ram_read(self.pc)
@@ -119,3 +134,11 @@ class CPU:
             elif opcode == MUL: # Multiply the values in two registers together and store the result in registerA.
                 self.reg[operand_a] *= self.reg[operand_b]
                 self.pc += 3
+
+            elif opcode == PUSH:
+                self.push(operand_a)
+                self.pc += 2
+
+            elif opcode == POP:
+                self.pop(operand_a)
+                self.pc += 2
