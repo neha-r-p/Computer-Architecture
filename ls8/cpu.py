@@ -12,8 +12,8 @@ class CPU:
         self.ram = [0] * 256 #holds values 0 to 255
         self.sp = 7 #number in reg reserved for sp
         self.reg[self.sp] = 0xF4 #start of empty stack
-        self.fl = '00000LGE' #initial flag register
-
+        self.fl = 4 #flag register
+        self.reg[self.fl] = '00000LGE'
 
     def ram_read(self, address):
         return self.ram[address]
@@ -81,12 +81,13 @@ class CPU:
         #elif op == "SUB": etc
 
         elif op == "CMP":
+            # breakpoint()
             if reg_a == reg_b:
-                self.fl = 0b00000001
+                self.reg[self.fl] = 0b00000001
             elif reg_a < reg_b:
-                self.fl = 0b00000100
+                self.reg[self.fl] = 0b00000100
             elif reg_a > reg_b:
-                self.fl = 0b00000010
+                self.reg[self.fl] = 0b00000010
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -124,6 +125,8 @@ class CPU:
         POP = 0b01000110
         CMP = 0b10100111
         JMP = 0b01010100
+        JEQ = 0b01010101
+        JNE= 0b01010110
 
         while running:
             ir = self.ram_read(self.pc)
@@ -156,8 +159,25 @@ class CPU:
                 self.pc += 2
 
             elif opcode == CMP:
-                self.alu("CMP", operand_a, operand_b)
+                self.alu("CMP", self.reg[operand_a], self.reg[operand_b])
                 self.pc += 3
             
             elif opcode == JMP:
-                reg_address = self.ram[operand_a] #Jump to the address stored in the given register.
+                reg_address = self.reg[operand_a] #Jump to the address stored in the given register.
+                self.pc = reg_address #Set the PC to the address stored in the given register.
+
+            elif opcode == JEQ:
+                # breakpoint()
+                if self.reg[self.fl] == 0b00000001: #If equal flag is set (true)
+                    reg_address = self.reg[operand_a] #address stored in given register
+                    self.pc = reg_address #jump
+                else:
+                    self.pc +=2
+
+            elif opcode == JNE:
+                if self.reg[self.fl] == 0b00000100 or self.reg[self.fl] == 0b00000010: #if equal flag is set to false
+                    reg_address = self.reg[operand_a] #address stored in given register
+                    self.pc = reg_address #jump
+                else:
+                    self.pc += 2
+
