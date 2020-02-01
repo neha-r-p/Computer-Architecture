@@ -12,6 +12,7 @@ class CPU:
         self.ram = [0] * 256 #holds values 0 to 255
         self.sp = 7 #number in reg reserved for sp
         self.reg[self.sp] = 0xF4 #start of empty stack
+        self.fl = '00000LGE' #initial flag register
 
 
     def ram_read(self, address):
@@ -78,6 +79,15 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+
+        elif op == "CMP":
+            if reg_a == reg_b:
+                self.fl = 0b00000001
+            elif reg_a < reg_b:
+                self.fl = 0b00000100
+            elif reg_a > reg_b:
+                self.fl = 0b00000010
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -112,6 +122,8 @@ class CPU:
         MUL = 0b10100010
         PUSH = 0b01000101
         POP = 0b01000110
+        CMP = 0b10100111
+        JMP = 0b01010100
 
         while running:
             ir = self.ram_read(self.pc)
@@ -142,3 +154,10 @@ class CPU:
             elif opcode == POP:
                 self.pop(operand_a)
                 self.pc += 2
+
+            elif opcode == CMP:
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 3
+            
+            elif opcode == JMP:
+                reg_address = self.ram[operand_a] #Jump to the address stored in the given register.
